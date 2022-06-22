@@ -1,7 +1,7 @@
 # Geocoding a csv column of "addresses" in R
 
 #load ggmap
-ggmap::register_google(key = 'AIzaSyAbypWUq7Gvil3tKWusGGRlXfrh8AHAyz0')
+ggmap::register_google(key = 'KEY')
 library(readr)
 
 # Read in the CSV data and store it in a variable 
