@@ -6,23 +6,8 @@ devtools::install_github("dr-harper/ggmapstyles", force=TRUE)
 
 # Load packages
 library(ggmap)
-library(rlang)
-library(cli)
-library(usethis)
-library(devtools)
 library(ggmapstyles)
 library(readr)
-
-library(sf)
-library(ggplot2)
-library(tmap)
-library(tmaptools)
-library(leaflet)
-library(dplyr)
-
-# If you have trouble downloading devtools where it tells you are missing package "cli" try this
-# remove.packages("cli")
-# install.packages("cli")
 
 # Put in your Google API KEY
 ggmap::register_google(key = 'AIzaSyAbypWUq7Gvil3tKWusGGRlXfrh8AHAyz0')
@@ -50,22 +35,4 @@ for(i in 1:nrow(origAddress))
 # Write a CSV file containing origAddress to the working directory
 write_excel_csv(origAddress, "geocoded_stores.csv")
 
-# load map data
-geocoded_stores <- read.csv(file= "Github/711Map/geocoded_stores.csv", encoding= "UTF-8", stringsAsFactors = FALSE)
 
-library(ggmapstyles)
-library(rjson)
-basemap <- get_snazzymap("Taiwan", mapRef = "https://snazzymaps.com/style/83/muted-blue")
-ggmap(basemap)
-
-library(ggmap)
-basemap2 <- get_map(location="Taiwan", zoom=7)
-
-# Plot map data
-ggmap(basemap2) + geom_point(data=geocoded_stores, aes(x=lon, y=lat), size=0.5) + theme_bw() 
-
-
-options(scipen=999)
-basemap <- st_read("Github/711Map/TWCityTownship/CityTownship.shp", stringAsFactors=F)
-
-toGeoJSON(data= geocoded_stores, geocoded_storesGeoJSON,)

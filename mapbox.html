@@ -17,7 +17,7 @@ body { margin: 0; padding: 0; }
 	mapboxgl.accessToken = 'pk.eyJ1IjoiYXRpYW4xMjAyIiwiYSI6ImNsNHkzZndtdzA2bDIzZHVsMXR3MjV0MmQifQ.9S1iYiOH9Ywc_gIvDauoOA';
 const map = new mapboxgl.Map({
 container: 'map',
-style: 'mapbox://styles/mapbox/light-v10',
+style: 'mapbox://styles/atian1202/cl1afhbvy000h15nj9n2m9oiz',
 center: [120.5854674, 23.55], // initial map center as Taiwan in [lon, lat]
 zoom: 7
 });
@@ -46,7 +46,7 @@ map.addLayer({
 'source': 'boundary',
 'layout': {},
 'paint': {
-'fill-color': '#627BC1',
+'fill-color': '',
 'fill-opacity': [
 'case',
 ['boolean', ['feature-state', 'hover'], false],
@@ -62,7 +62,7 @@ map.addLayer({
 'source': 'boundary',
 'layout': {},
 'paint': {
-'line-color': '#627BC1',
+'line-color': '#d6b892',
 'line-width': 2
 }
 });
@@ -72,8 +72,18 @@ map.addLayer({
 'type': 'circle',
 'source': 'stores',
 'layout': {},
+'paint': {
+'circle-color': '#8c755e',
+// Make circles larger as the user zooms from z12 to z22.
+'circle-radius': {
+'base': 5,
+'stops': [
+[12, 2.5],
+[22, 180]
+]
+},
+}
 });
-
 
 // When the user moves their mouse over the state-fill layer, we'll update the
 // feature state for the feature under the mouse.
