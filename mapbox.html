@@ -33,7 +33,8 @@ map.addSource('boundary', {
 
 map.addSource('stores', {
 'type': 'geojson',
-'data': './stores_categories2.geojson'
+//'data': './geocoded_stores.geojson'
+'data': './stores_categories.geojson'
 });
 
 // ADD LAYERS
@@ -84,6 +85,9 @@ map.addLayer({
 },
 }
 });
+
+//TOGGLE
+
 
 // When the user moves their mouse over the state-fill layer, we'll update the
 // feature state for the feature under the mouse.
