@@ -1,125 +1,336 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>Create a hover effect</title>
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
-<style>
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
-</style>
-</head>
-<body>
-<div id="map"></div>
-<script>
-	mapboxgl.accessToken = 'pk.eyJ1IjoiYXRpYW4xMjAyIiwiYSI6ImNsNHkzZndtdzA2bDIzZHVsMXR3MjV0MmQifQ.9S1iYiOH9Ywc_gIvDauoOA';
-const map = new mapboxgl.Map({
-container: 'map',
-style: 'mapbox://styles/atian1202/cl1afhbvy000h15nj9n2m9oiz',
-center: [120.5854674, 23.55], // initial map center as Taiwan in [lon, lat]
-zoom: 7
-});
-let hoveredStateId = null;
+	<head>
+		<meta charset="utf-8">
+		<title>Create a hover effect</title>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+		<link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+		<script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+		<style>
+			body { margin: 0; padding: 0; }
+			#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+			#console {
+					position: absolute;
+					width: 320px;
+					margin: 10px;
+					padding: 10px 20px 10px 30px;
+					background-color: #F0F0F1;
+					border-radius: 5px;
+					z-index: 15;
+					transition: 0.3s ease-in-out;
+					box-shadow: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+			}
+			.active {
+					transform: translate3d(-300px, 0, 0);
+					transition: 0.3s ease-in-out;
+			}
+			.itemWrapper {
+					margin-top: -20px;
+			}
+			#toggleConsole {
+					position: absolute;
+					right: 5px;
+					top: 0px;
+			}
+			#toggleConsole img {
+					width: 16px;
+					opacity: 0.7;
+			}
+			#toggleConsole img:hover {
+					opacity: 0.5;
+					transition: all .5s ease;
+					cursor: pointer;
+			}
+			.togglePlanned, .toggleOperational{
+					position: relative;
+					height: 14px;
+					width: 35px;
+					border-radius: 15px;
+					background: #cfcfcf;
+					margin: 8px 0;
+			}
+			.togglePlanned input, .toggleOperational input{
+					opacity: 0;
+					width: 100%;
+					height: 200%;
+					position: absolute;
+					top: -7px;
+					left: 0;
+					z-index: 2;
+					margin: 0
+			}
+			.togglePlanned input:nth-child(2):checked, .toggleOperational input:nth-child(2):checked {
+					z-index: 1;
+			}
+			.toggle__pointer {
+					position: absolute;
+					top: -3.5px;
+					left: 18px;
+					width: 20px;
+					height: 20px;
+					border-radius: 15px;
+					-webkit-transition: left .15s ease-out;
+					transition: left .15s ease-out;
+			}
+			.togglePlanned input:nth-child(2):checked+.toggle__pointer, .toggleOperational input:nth-child(2):checked+.toggle__pointer {
+					left: 0px;
+					background-color: #777777;
+			}
+			.toggle__pointer.colorPlanned {
+					background-color: #d8b365;
+			}
+			.toggle__pointer.colorOperational {
+					background-color: #5ab4ac;
+			}
+			.mapboxgl-popup.colorPlanned h3 {
+					background: #d8b365 !important;
+					color: #fff;
+			}
+			.mapboxgl-popup.colorOperational h3 {
+					background: #5ab4ac !important;
+					color: #fff;
+			}
+		</style>
+	</head>
 
-// ADD SOURCES
+	<body>
+		<div id="map"></div>
+		<div id='console'>
+			 <div class="verticalLine">
+					<span id="toggleConsole">
+					<img src="./img/toggle.png" />
+					</span>
+					<h1 id='title'>Hydro plants in Latin America</h1>
+					<div class="itemWrapper">
+						 <svg id="reset" class="item" version="1.1" x="0px" y="0px" viewBox="0 0 48.9 42"
+								style="enable-background:new 0 0 48.9 42;" xml:space="preserve">
+								<g id="">
+									 <path id="XMLID_2_" class="st0" d="M13.2,32.2c-4.1-4.1-5.4-9.7-4.3-14.9l4.4,1.4L10.1,6L0.1,14.3l4.4,1.4
+											c-1.7,6.8,0.1,14.3,5.4,19.7c6.2,6.2,15.5,7.7,23.1,4.2L31.8,35C25.8,38.2,18.2,37.2,13.2,32.2z" />
+									 <path id="XMLID_1_" class="st0" d="M44.5,26c1.7-6.8-0.1-14.3-5.4-19.7c-6.2-6.2-15.4-7.6-23-4.3l1.1,4.6c6-3,13.6-2.1,18.5,2.9
+											c4.1,4.1,5.4,9.7,4.3,14.9l-4.4-1.4l3.1,12.7l10.1-8.4L44.5,26z" />
+								</g>
+						 </svg>
+						 <div class="item">
+								<p> Reset Status</p>
+						 </div>
+					</div>
+					<div class="itemWrapper">
+						 <h2 class="subtitle"> Status </h2>
+					</div>
+					<div class="itemWrapper">
+						 <div class='togglePlanned item' id="filterPlanned">
+								<input id='layerPlannedOn' type="radio" value="layerPlannedOn" name="togglePlanned" checked='checked'>
+								<input id='layerPlannedOff' type="radio" value="layerPlannedOff" name="togglePlanned">
+								<div class="toggle__pointer colorPlanned"></div>
+						 </div>
+						 <div class="item">
+								<h2 id="four">Planned</h2>
+						 </div>
+					</div>
+					<div class="itemWrapper">
+						 <div class='toggleOperational item' id="filterOperational">
+								<input id='layerOperationalOn' type="radio" value="layerOperationalOn" name="toggleOperational" checked='checked'>
+								<input id='layerOperationalOff' type="radio" value="layerOperationalOff" name="toggleOperational">
+								<div class="toggle__pointer colorOperational"></div>
+						 </div>
+						 <div class="item">
+								<h2 id="six">Operational</h2>
+						 </div>
+					</div>
 
-map.on('load', () => {
-map.addSource('boundary', {
-'type': 'geojson',
-'data': './boundary.geojson'
-});
+			 <fieldset>
+					<div class="precipTitle">
+							<div class="inline info" id="precipInfo">
+									<img src="img/info.png" />
+									<span class="tooltiptext">The division of sub-regions in Latin America corresponds to IPCC criteria, the source of information consulted for variations in precipitation</span>
+							</div>
+					</div>
+					<div id='legend'></div>
+			 </fieldset>
+		</div>
 
-map.addSource('stores', {
-'type': 'geojson',
-//'data': './geocoded_stores.geojson'
-'data': './stores_categories.geojson'
-});
+		<!-- end line -->
+		</div>
+	<script>
+		mapboxgl.accessToken = 'pk.eyJ1IjoiYXRpYW4xMjAyIiwiYSI6ImNsNHkzZndtdzA2bDIzZHVsMXR3MjV0MmQifQ.9S1iYiOH9Ywc_gIvDauoOA';
 
-// ADD LAYERS
+		const map = new mapboxgl.Map({
+			container: 'map',
+			style: 'mapbox://styles/atian1202/cl1afhbvy000h15nj9n2m9oiz',
+			center: [120.5854674, 23.55], // initial map center as Taiwan in [lon, lat]
+			zoom: 7
+		});
 
-// The feature-state dependent fill-opacity expression will render the hover effect
-// when a feature's hover state is set to true.
-map.addLayer({
-'id': 'boundary-fills',
-'type': 'fill',
-'source': 'boundary',
-'layout': {},
-'paint': {
-'fill-color': '',
-'fill-opacity': [
-'case',
-['boolean', ['feature-state', 'hover'], false],
-1,
-0.5
-]
-}
-});
+		let hoveredStateId = null;
+		let popup;
+		let popupBool = false;
+		let activeStatus = ['Planned', 'Operational']
+		let allStatus = ['Planned', 'Operational']
+		let statusFilter = ["in", ["get", "status"],
+				["literal", activeStatus]
+		];
 
-map.addLayer({
-'id': 'boundary-borders',
-'type': 'line',
-'source': 'boundary',
-'layout': {},
-'paint': {
-'line-color': '#d6b892',
-'line-width': 2
-}
-});
+		const geoJsonData = {
+				'type': 'FeatureCollection',
+				'features': []
+		};
 
-map.addLayer({
-'id': 'stores',
-'type': 'circle',
-'source': 'stores',
-'layout': {},
-'paint': {
-'circle-color': '#8c755e',
-// Make circles larger as the user zooms from z12 to z22.
-'circle-radius': {
-'base': 5,
-'stops': [
-[12, 2.5],
-[22, 180]
-]
-},
-}
-});
+		// ADD SOURCES
 
-//TOGGLE
+		map.on('load', () => {
+			map.addSource('boundary', {
+				'type': 'geojson',
+				'data': './boundary.geojson'
+			});
 
+		map.addSource('stores', {
+			'type': 'geojson',
+			//'data': './geocoded_stores.geojson'
+			'data': './stores_categories.geojson'
+		});
 
-// When the user moves their mouse over the state-fill layer, we'll update the
-// feature state for the feature under the mouse.
-map.on('mousemove', 'boundary-fills', (e) => {
-if (e.features.length > 0) {
-if (hoveredStateId !== null) {
-map.setFeatureState(
-{ source: 'boundary', id: hoveredStateId },
-{ hover: false }
-);
-}
-hoveredStateId = e.features[0].id;
-map.setFeatureState(
-{ source: 'boundary', id: hoveredStateId },
-{ hover: true }
-);
-}
-});
+		// ADD LAYERS
 
-// When the mouse leaves the state-fill layer, update the feature state of the
-// previously hovered feature.
-map.on('mouseleave', 'state-fills', () => {
-if (hoveredStateId !== null) {
-map.setFeatureState(
-{ source: 'boundary', id: hoveredStateId },
-{ hover: false }
-);
-}
-hoveredStateId = null;
-});
-});
-</script>
+		// The feature-state dependent fill-opacity expression will render the hover effect
+		// when a feature's hover state is set to true.
+		map.addLayer({
+			'id': 'boundary-fills',
+			'type': 'fill',
+			'source': 'boundary',
+			'layout': {},
+			'paint': {
+			'fill-color': '',
+			'fill-opacity': [
+				'case',
+				['boolean', ['feature-state', 'hover'], false],
+				1, 0.5]
+			}
+		});
 
-</body>
+		map.addLayer({
+			'id': 'boundary-borders',
+			'type': 'line',
+			'source': 'boundary',
+			'layout': {},
+			'paint': {
+				'line-color': '#d6b892',
+				'line-width': 2
+			}
+		});
+
+		map.addLayer({
+			'id': 'stores',
+			'type': 'circle',
+			'source': 'stores',
+			'layout': {},
+			'paint': {
+				'circle-color': '#8c755e',
+				// Make circles larger as the user zooms from z12 to z22.
+				'circle-radius': {
+				'base': 5,
+				'stops': [[12, 2.5], [22, 180]]
+				},
+			}
+		});
+
+		// toggle createFilterStatus
+		function createFilterStatus(filterName, layerOnName, statusString) {
+				document.getElementById(filterName).addEventListener('change', function(e) {
+						if(popupBool){
+								popup.remove();
+						}
+						if (e.target.value === layerOnName) {
+								if (activeStatus.indexOf(statusString) == -1) {
+										activeStatus.push(statusString)
+								}
+								statusFilter = ["in", ["get", "status"],
+										["literal", activeStatus]
+								];
+								capacityFilter = [">=", ["get", "capacity"], sliderValG];
+
+								map.setFilter('plants', ['all', statusFilter, capacityFilter]);
+
+						} else {
+								if (activeStatus.indexOf(statusString) !== -1) {
+										var index = activeStatus.indexOf(statusString);
+										activeStatus.splice(index, 1);
+								}
+								statusFilter = ["in", ["get", "status"],
+										["literal", activeStatus]
+								];
+								capacityFilter = [">=", ["get", "capacity"], sliderValG];
+								map.setFilter('plants', ['all', statusFilter, capacityFilter]);
+
+						}
+				});
+
+		}
+
+		createFilterStatus('filterPlanned', 'layerPlannedOn', 'Planned')
+		createFilterStatus('filterOperational', 'layerOperationalOn', 'Operational')
+
+		$("#reset").click(function() {
+				if(popupBool){
+						popup.remove();
+				}
+
+				for (var i = 0; i < allStatus.length; i++) {
+						if (activeStatus.indexOf(allStatus[i]) == -1) {
+								activeStatus.push(allStatus[i]);
+						}
+				}
+				statusFilter = ["in", ["get", "status"],
+						["literal", activeStatus]
+				];
+				capacityFilter = ['>=', ['get', 'capacity'], sliderValG];
+				map.setFilter('plants', ['all', statusFilter, capacityFilter]);
+
+				$("#layerPlannedOn").prop('checked', true);
+				$("#layerPlannedOff").prop('checked', false);
+				$("#layerOperationalOn").prop('checked', true);
+				$("#layerOperationalOff").prop('checked', false);
+
+		});
+
+		$("#toggleConsole").css("top", 230);
+
+		//TODO fix the hover over county highlight
+
+		// When the user moves their mouse over the state-fill layer, we'll update the
+		// feature state for the feature under the mouse.
+		map.on('mousemove', 'boundary-fills', (e) => {
+			if (e.features.length > 0) {
+				if (hoveredStateId !== null) {
+					map.setFeatureState(
+						{ source: 'boundary', id: hoveredStateId },
+						{ hover: false }
+					);
+				}
+
+				hoveredStateId = e.features[0].id;
+				map.setFeatureState(
+					{ source: 'boundary', id: hoveredStateId },
+					{ hover: true }
+				);
+			}
+		});
+
+		// When the mouse leaves the state-fill layer, update the feature state of the
+		// previously hovered feature.
+		map.on('mouseleave', 'state-fills', () => {
+			if (hoveredStateId !== null) {
+				map.setFeatureState(
+						{ source: 'boundary', id: hoveredStateId },
+						{ hover: false }
+				);
+			}
+
+			hoveredStateId = null;
+			});
+		});
+
+	</script>
+
+	</body>
 </html>
